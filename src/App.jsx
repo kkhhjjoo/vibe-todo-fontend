@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 
-const API_BASE = 'http://localhost:5000';
-// 백엔드에서 라우터를 app.use('/api/todos', todoRouter) 처럼 마운트했다면 '/api/todos'
-// app.use('/', todoRouter) 라면 '' 로 두세요.
-const TODOS_PATH = '/api/todos';
+// .env의 VITE_API_URL 사용 (예: https://vibe-todo-xxx.herokuapp.com/api/todos)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/todos';
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -19,7 +17,7 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}${TODOS_PATH}`);
+      const res = await fetch(API_URL);
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || '할일 목록을 불러오지 못했습니다.');
@@ -45,7 +43,7 @@ function App() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}${TODOS_PATH}`, {
+      const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: trimmed, completed: false }),
@@ -64,7 +62,7 @@ function App() {
   const deleteTodo = async (id) => {
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}${TODOS_PATH}/${id}`, {
+      const res = await fetch(`${API_URL}/${id}`, {
         method: 'DELETE',
       });
       if (res.status === 404) {
@@ -86,7 +84,7 @@ function App() {
     const nextCompleted = !todo.completed;
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}${TODOS_PATH}/${todo._id}`, {
+      const res = await fetch(`${API_URL}/${todo._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completed: nextCompleted }),
@@ -112,7 +110,7 @@ function App() {
     if (!trimmed) return;
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}${TODOS_PATH}/${editingId}`, {
+      const res = await fetch(`${API_URL}/${editingId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: trimmed }),
